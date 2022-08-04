@@ -1,4 +1,5 @@
 import addDays from 'date-fns/addDays';
+import addMonths from 'date-fns/addMonths';
 import isBefore from 'date-fns/isBefore';
 import isToday from 'date-fns/isToday';
 import startOfDay from 'date-fns/startOfDay';
@@ -90,15 +91,20 @@ export function addMonth({ calendars, offset, maxDate }) {
  * @param {Date} param.minDate The earliest date available
  * @returns {Boolean} Whether the back button should be disabled.
  */
-export function isBackDisabled({ calendars, minDate }) {
+export function isBackDisabled({ calendars, offset, minDate }) {
   if (!minDate) {
     return false;
   }
+
   const { firstDayOfMonth } = calendars[0];
-  const firstDayOfMonthMinusOne = addDays(firstDayOfMonth, -1);
-  if (isBefore(firstDayOfMonthMinusOne, minDate)) {
+
+  const previousMonth = addMonths(firstDayOfMonth, -(offset - 1));
+  const lastDayTargetMonth = addDays(previousMonth, -1);
+
+  if (isBefore(lastDayTargetMonth, minDate)) {
     return true;
   }
+
   return false;
 }
 
@@ -110,15 +116,20 @@ export function isBackDisabled({ calendars, minDate }) {
  * @param {Date} param.maxDate The furthest date available
  * @returns {Boolean} Whether the forward button should be disabled.
  */
-export function isForwardDisabled({ calendars, maxDate }) {
+export function isForwardDisabled({ calendars, offset, maxDate }) {
   if (!maxDate) {
     return false;
   }
+
   const { lastDayOfMonth } = calendars[calendars.length - 1];
-  const lastDayOfMonthPlusOne = addDays(lastDayOfMonth, 1);
-  if (isBefore(maxDate, lastDayOfMonthPlusOne)) {
+
+  const firstDayNextMonth = addDays(lastDayOfMonth, 1);
+  const firstDayTargetMonth = addMonths(firstDayNextMonth, offset - 1);
+
+  if (isBefore(maxDate, firstDayTargetMonth)) {
     return true;
   }
+
   return false;
 }
 
